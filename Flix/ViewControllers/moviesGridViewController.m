@@ -94,7 +94,31 @@
         NSString *fullPosterUrl = [baseUrlString stringByAppendingFormat:posterUrlString];
         NSURL *posterUrl = [NSURL URLWithString:fullPosterUrl];
         cell.posterView.image = nil;
-        [cell.posterView setImageWithURL: posterUrl];
+        NSURLRequest *request = [NSURLRequest requestWithURL:posterUrl];
+        //[cell.posterView setImageWithURL: posterUrl];
+        //__weak MovieCell *weakSelf = self;
+        __weak UIImageView *weakImageView = cell.posterView;
+        [cell.posterView setImageWithURLRequest: request placeholderImage:nil
+        success:^(NSURLRequest *imageRequest, NSHTTPURLResponse *imageResponse, UIImage *image) {
+            // imageResponse will be nil if the image is cached
+            if (imageResponse) {
+                //NSLog(@"Image was NOT cached, fade in image");
+                weakImageView.alpha = 0.0;
+                weakImageView.image = image;
+                
+                //Animate UIImageView back to alpha 1 over 0.3sec
+                [UIView animateWithDuration:6 animations:^{
+                    weakImageView.alpha = 1.0;
+                }];
+            }
+            else {
+                //NSLog(@"Image was cached so just update the image");
+                weakImageView.image = image;
+            }
+        }
+        failure:^(NSURLRequest *request, NSHTTPURLResponse * response, NSError *error) {
+            // do something for the failure condition
+            NSLog(@"Process Failed..."); }];
     }else{
         cell.posterView.image = nil;
 }
