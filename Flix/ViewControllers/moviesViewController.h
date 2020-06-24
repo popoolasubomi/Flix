@@ -9,8 +9,17 @@
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
+@class Reachability;
 
-@interface moviesViewController : UIViewController
+@interface moviesViewController : UIViewController{
+    Reachability* internetReachable;
+    Reachability* hostReachable;
+}
+
+@property BOOL internetActive;
+@property BOOL hostActive;
+
+- (void) checkNetworkStatus:(NSNotification *)notice;
 
 @end
 

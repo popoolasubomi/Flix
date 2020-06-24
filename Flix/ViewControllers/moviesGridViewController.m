@@ -9,12 +9,18 @@
 #import "moviesGridViewController.h"
 #import "movieCollectionCell.h"
 #import "UIImageView+AFNetworking.h"
+#import "detailsViewController.h"
 
-@interface moviesGridViewController ()<UICollectionViewDelegate, UICollectionViewDataSource>
+@interface moviesGridViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate>
 
 @property (nonatomic, strong) NSArray *movies;
+@property(nonatomic, strong) NSMutableArray *fullMovies;
+@property(nonatomic, strong) NSMutableArray *data;
+@property(nonatomic, strong) NSArray *filteredData;
 @property(nonatomic, strong) UIRefreshControl *refreshControl;
+
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 
 
 @end
@@ -23,8 +29,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
+    
+    self.searchBar.delegate = self;
+    
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(fetchMovies) forControlEvents:UIControlEventValueChanged];
+    [self.collectionView insertSubview:self.refreshControl atIndex:0];
+    [self.collectionView addSubview:self.refreshControl];
     
     [self fetchMovies];
     
@@ -38,10 +52,7 @@
     CGFloat itemHeight = itemWidth * 1.25;
     layout.itemSize = CGSizeMake(itemWidth, itemHeight);
     
-    self.refreshControl = [[UIRefreshControl alloc] init];
-    [self.refreshControl addTarget:self action:@selector(fetchMovies) forControlEvents:UIControlEventValueChanged];
-    [self.collectionView insertSubview:self.refreshControl atIndex:0];
-    [self.collectionView addSubview:self.refreshControl];
+   
 }
 
 -(void) fetchMovies{
@@ -55,28 +66,25 @@
            else {
                NSDictionary *dataDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
                self.movies = dataDictionary[@"results"];
-               // TODO: Get the array of movies
-               // TODO: Store the movies in a property to use elsewhere
-               // TODO: Reload your table view data
+               self.fullMovies = dataDictionary[@"results"];
+               self.data = [NSMutableArray new];
+               
+               for (NSDictionary *movie in self.movies){
+                   NSString *info = movie[@"title"];
+                   [self.data addObject: info];
+               }
+
                [self.collectionView reloadData];
            }
         [self.refreshControl endRefreshing];
        }];
     [task resume];
 }
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 - (NSInteger)collectionView:(nonnull UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return self.movies.count;
 }
+
 - (nonnull __kindof UICollectionViewCell *)collectionView:(nonnull UICollectionView *)collectionView cellForItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
     movieCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier: @"MovieCollectionCell" forIndexPath:indexPath];
     NSDictionary *movie = self.movies[indexPath.item];
@@ -91,6 +99,40 @@
         cell.posterView.image = nil;
 }
     return cell;
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
+    if (searchText.length != 0){
+        NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSString *evaluatedObject, NSDictionary *bindings) {
+            return [evaluatedObject containsString:searchText];
+        }];
+        self.filteredData = [self.data filteredArrayUsingPredicate:predicate];
+        NSMutableArray *dummy_array = [NSMutableArray new];
+        for (NSDictionary *movie in self.fullMovies){
+            NSString *movie_data = movie[@"title"];
+            if ([self.filteredData containsObject: movie_data]){
+                [dummy_array addObject: movie];
+            }
+        }
+        self.movies = dummy_array;
+    }
+    else{
+        self.movies = self.fullMovies;
+    }
+    [self.collectionView reloadData];
+}
+
+- (IBAction)onSwipeDownActivity:(id)sender {
+    [self.view endEditing:YES];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+          UITableViewCell *tappedCell = sender;
+          NSIndexPath *indexPath = [self.collectionView indexPathForCell:tappedCell];
+          NSDictionary *movie = self.movies[indexPath.row];
+          
+          detailsViewController *DetailsViewController = [segue destinationViewController];
+          DetailsViewController.movie = movie;
 }
 
 @end
