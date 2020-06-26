@@ -12,8 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OAPMovieFetcher : NSObject
 
+@property (nonatomic, strong) NSArray *movies;
 + (OAPMovieFetcher *)sharedObject;
-
+- (void)fetchMoviesWithCompletionHandler:(void(^)(NSArray*))completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

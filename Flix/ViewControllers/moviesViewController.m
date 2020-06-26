@@ -39,38 +39,27 @@
     
     self.tableView.alpha = 0;
     
+    
+    
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(fetchMovies) forControlEvents:UIControlEventValueChanged];
     [self.tableView insertSubview:self.refreshControl atIndex:0];
     [self.tableView addSubview:self.refreshControl];
     
     [self fetchMovies];
-    //[[OAPMovieFetcher sharedObject] fetchMovies];
-    
     //[self customizeNavigationBar];
     
     [NSTimer scheduledTimerWithTimeInterval:1.50f target:self selector:@selector(revealData) userInfo:nil repeats:NO];
 }
 
+
 -(void) fetchMovies{
-    NSURL *url = [NSURL URLWithString:@"https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed"];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:10.0];
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-           if (error != nil) {
-               NSLog(@"%@", [error localizedDescription]);
-           }
-           else {
-               NSDictionary *dataDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
-               self.movies = dataDictionary[@"results"];
-               // TODO: Get the array of movies
-               // TODO: Store the movies in a property to use elsewhere
-               // TODO: Reload your table view data
-              [self.tableView reloadData];
-           }
+    OAPMovieFetcher *oapMovieFetcher = [OAPMovieFetcher sharedObject];
+    [oapMovieFetcher fetchMoviesWithCompletionHandler:^(NSArray *movie) {
+        self.movies = movie;
         [self.refreshControl endRefreshing];
-       }];
-    [task resume];
+        [self.tableView reloadData];
+    }];
 }
 
 -(void) customizeNavigationBar{
