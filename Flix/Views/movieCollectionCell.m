@@ -6,8 +6,8 @@
 //  Copyright © 2020 Ogo-Oluwasobomi Popoola. All rights reserved.
 //
 
-#import "movieCollectionCell.h"
+#import "MovieCollectionCell.h"
 
-@implementation movieCollectionCell
+@implementation MovieCollectionCell
 
 @end

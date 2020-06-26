@@ -6,21 +6,22 @@
 //  Copyright © 2020 Ogo-Oluwasobomi Popoola. All rights reserved.
 //
 
-#import "detailsViewController.h"
+#import "DetailsViewController.h"
 #import "UIImageView+AFNetworking.h"
 #import "WebKitViewController.h"
 
-@interface detailsViewController ()
+@interface DetailsViewController ()
 
 @property (weak, nonatomic) IBOutlet UIImageView *backdropView;
 @property (weak, nonatomic) IBOutlet UIImageView *posterView;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *synopsisLabel;
 @property (weak, nonatomic) IBOutlet UILabel *releaseDate;
+@property (weak, nonatomic) IBOutlet UILabel *rating;
 
 @end
 
-@implementation detailsViewController
+@implementation DetailsViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -48,7 +49,7 @@
     NSURLRequest *requestSmall = [NSURLRequest requestWithURL:urlSmall];
     NSURLRequest *requestLarge = [NSURLRequest requestWithURL:urlLarge];
 
-    __weak detailsViewController *weakSelf = self;
+    __weak DetailsViewController *weakSelf = self;
 
     [self.backdropView setImageWithURLRequest:requestSmall
       placeholderImage:nil
@@ -85,9 +86,11 @@
     self.titleLabel.text = self.movie[@"title"];
     self.synopsisLabel.text = self.movie[@"overview"];
     self.releaseDate.text = self.movie[@"release_date"];
+    self.rating.text = [NSString stringWithFormat: @"%@", self.movie[@"vote_average"]];
     
     [self.titleLabel sizeToFit];
     [self.synopsisLabel sizeToFit];
+    [self.rating sizeToFit];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

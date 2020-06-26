@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 @class Reachability;
 
-@interface moviesViewController : UIViewController{
+@interface MoviesViewController : UIViewController{
     Reachability* internetReachable;
     Reachability* hostReachable;
 }

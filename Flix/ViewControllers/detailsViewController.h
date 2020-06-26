@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface detailsViewController : UIViewController
+@interface DetailsViewController : UIViewController
 
 @property(nonatomic, strong) NSDictionary *movie;
 

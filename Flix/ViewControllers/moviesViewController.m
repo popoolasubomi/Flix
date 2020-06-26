@@ -6,13 +6,14 @@
 //  Copyright © 2020 Ogo-Oluwasobomi Popoola. All rights reserved.
 //
 
-#import "moviesViewController.h"
+#import "MoviesViewController.h"
 #import "movieCell.h"
 #import "UIImageView+AFNetworking.h"
-#import "detailsViewController.h"
+#import "DetailsViewController.h"
 #import "Reachability.h"
+#import "OAPMovieFetcher.h"
 
-@interface moviesViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface MoviesViewController () <UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong) NSArray *movies;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -21,7 +22,7 @@
 
 @end
 
-@implementation moviesViewController
+@implementation MoviesViewController
 
 @synthesize internetActive;
 @synthesize hostActive;
@@ -44,6 +45,7 @@
     [self.tableView addSubview:self.refreshControl];
     
     [self fetchMovies];
+    //[[OAPMovieFetcher sharedObject] fetchMovies];
     
     //[self customizeNavigationBar];
     
@@ -230,12 +232,9 @@
        NSIndexPath *indexPath = [self.tableView indexPathForCell:tappedCell];
        NSDictionary *movie = self.movies[indexPath.row];
        
-       detailsViewController *DetailsViewController = [segue destinationViewController];
-       DetailsViewController.movie = movie;
+       DetailsViewController *detailsViewController = [segue destinationViewController];
+       detailsViewController.movie = movie;
 }
-
-
-
 
 
 @end

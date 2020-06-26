@@ -6,16 +6,14 @@
 //  Copyright © 2020 Ogo-Oluwasobomi Popoola. All rights reserved.
 //
 
-#import "moviesGridViewController.h"
-#import "movieCollectionCell.h"
+#import "MoviesGridViewController.h"
+#import "MovieCollectionCell.h"
 #import "UIImageView+AFNetworking.h"
-#import "detailsViewController.h"
+#import "DetailsViewController.h"
 
-@interface moviesGridViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate>
+@interface MoviesGridViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate>
 
 @property (nonatomic, strong) NSArray *movies;
-@property(nonatomic, strong) NSMutableArray *fullMovies;
-@property(nonatomic, strong) NSMutableArray *data;
 @property(nonatomic, strong) NSArray *filteredData;
 @property(nonatomic, strong) UIRefreshControl *refreshControl;
 
@@ -25,7 +23,7 @@
 
 @end
 
-@implementation moviesGridViewController
+@implementation MoviesGridViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -66,14 +64,7 @@
            else {
                NSDictionary *dataDictionary = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
                self.movies = dataDictionary[@"results"];
-               self.fullMovies = dataDictionary[@"results"];
-               self.data = [NSMutableArray new];
-               
-               for (NSDictionary *movie in self.movies){
-                   NSString *info = movie[@"title"];
-                   [self.data addObject: info];
-               }
-
+               self.filteredData = self.movies;
                [self.collectionView reloadData];
            }
         [self.refreshControl endRefreshing];
@@ -82,12 +73,12 @@
 }
 
 - (NSInteger)collectionView:(nonnull UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.movies.count;
+    return self.filteredData.count;
 }
 
 - (nonnull __kindof UICollectionViewCell *)collectionView:(nonnull UICollectionView *)collectionView cellForItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    movieCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier: @"MovieCollectionCell" forIndexPath:indexPath];
-    NSDictionary *movie = self.movies[indexPath.item];
+    MovieCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier: @"MovieCollectionCell" forIndexPath:indexPath];
+    NSDictionary *movie = self.filteredData[indexPath.item];
     NSString *baseUrlString = @"https://image.tmdb.org/t/p/w500";
     if ([movie[@"poster_path"] isKindOfClass:[NSString class]]) {
         NSString *posterUrlString =  movie[@"poster_path"];
@@ -126,25 +117,22 @@
 }
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{
-    if (searchText.length != 0){
-        NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSString *evaluatedObject, NSDictionary *bindings) {
-            return [evaluatedObject containsString:searchText];
-        }];
-        self.filteredData = [self.data filteredArrayUsingPredicate:predicate];
-        NSMutableArray *dummy_array = [NSMutableArray new];
-        for (NSDictionary *movie in self.fullMovies){
-            NSString *movie_data = movie[@"title"];
-            if ([self.filteredData containsObject: movie_data]){
-                [dummy_array addObject: movie];
+        if (searchText) {
+            if (searchText.length != 0) {
+                NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NSDictionary *evaluatedObject, NSDictionary *bindings) {
+                    return [evaluatedObject[@"title"] containsString:searchText];
+                }];
+                self.filteredData = [self.movies filteredArrayUsingPredicate:predicate];
             }
+            else {
+                self.filteredData = self.movies;
+            }
+            NSLog(@"%d", self.filteredData.count);
+            [self.collectionView reloadData];
         }
-        self.movies = dummy_array;
-    }
-    else{
-        self.movies = self.fullMovies;
-    }
-    [self.collectionView reloadData];
 }
+
+
 
 - (IBAction)onSwipeDownActivity:(id)sender {
     [self.view endEditing:YES];
@@ -153,10 +141,10 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
           UITableViewCell *tappedCell = sender;
           NSIndexPath *indexPath = [self.collectionView indexPathForCell:tappedCell];
-          NSDictionary *movie = self.movies[indexPath.row];
+          NSDictionary *movie = self.filteredData[indexPath.item];
           
-          detailsViewController *DetailsViewController = [segue destinationViewController];
-          DetailsViewController.movie = movie;
+          DetailsViewController *detailsViewController = [segue destinationViewController];
+          detailsViewController.movie = movie;
 }
 
 @end
