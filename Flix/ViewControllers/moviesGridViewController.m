@@ -43,8 +43,8 @@
     
     UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
 
-    layout.minimumInteritemSpacing = 2;
-    layout.minimumLineSpacing = 2;
+    layout.minimumInteritemSpacing = 5;
+    layout.minimumLineSpacing = 5;
 
     CGFloat postersPerLine = 2;
     CGFloat itemWidth = (self.collectionView.frame.size.width - layout.minimumInteritemSpacing * (postersPerLine - 1)) / postersPerLine;
@@ -58,6 +58,7 @@
     OAPMovieFetcher *oapMovieFetcher = [OAPMovieFetcher sharedObject];
     [oapMovieFetcher fetchMoviesWithCompletionHandler:^(NSArray *movie) {
         self.movies = movie;
+        self.filteredData = self.movies;
         [self.refreshControl endRefreshing];
         [self.collectionView reloadData];
     }];
@@ -77,29 +78,22 @@
         NSURL *posterUrl = [NSURL URLWithString:fullPosterUrl];
         cell.posterView.image = nil;
         NSURLRequest *request = [NSURLRequest requestWithURL:posterUrl];
-        //[cell.posterView setImageWithURL: posterUrl];
-        //__weak MovieCell *weakSelf = self;
         __weak UIImageView *weakImageView = cell.posterView;
         [cell.posterView setImageWithURLRequest: request placeholderImage:nil
         success:^(NSURLRequest *imageRequest, NSHTTPURLResponse *imageResponse, UIImage *image) {
-            // imageResponse will be nil if the image is cached
             if (imageResponse) {
-                //NSLog(@"Image was NOT cached, fade in image");
                 weakImageView.alpha = 0.0;
                 weakImageView.image = image;
                 
-                //Animate UIImageView back to alpha 1 over 0.3sec
                 [UIView animateWithDuration:6 animations:^{
                     weakImageView.alpha = 1.0;
                 }];
             }
             else {
-                //NSLog(@"Image was cached so just update the image");
                 weakImageView.image = image;
             }
         }
         failure:^(NSURLRequest *request, NSHTTPURLResponse * response, NSError *error) {
-            // do something for the failure condition
             NSLog(@"Process Failed..."); }];
     }else{
         cell.posterView.image = nil;

@@ -15,20 +15,30 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" fixedFrame="YES" image="launch_image" translatesAutoresizingMaskIntoConstraints="NO" id="oLK-Zj-DLP">
-                                <rect key="frame" x="92" y="223" width="231" height="236"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="FLIX" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lDm-vC-rlo">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="FLIX" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lDm-vC-rlo">
                                 <rect key="frame" x="92" y="478" width="231" height="83"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="55"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" image="launch_image" translatesAutoresizingMaskIntoConstraints="NO" id="oLK-Zj-DLP">
+                                <rect key="frame" x="110" y="298" width="194" height="172"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="172" id="ulW-0D-qrg"/>
+                                </constraints>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="lDm-vC-rlo" secondAttribute="bottom" constant="301" id="4kt-pj-c59"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="oLK-Zj-DLP" secondAttribute="trailing" constant="110" id="BQ9-Lc-1Tv"/>
+                            <constraint firstItem="oLK-Zj-DLP" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="254" id="Kie-OI-HEX"/>
+                            <constraint firstItem="oLK-Zj-DLP" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="110" id="LGK-26-1It"/>
+                            <constraint firstItem="lDm-vC-rlo" firstAttribute="top" secondItem="oLK-Zj-DLP" secondAttribute="bottom" constant="8" id="PIs-7a-gZS"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="lDm-vC-rlo" secondAttribute="trailing" constant="91" id="boH-4u-MIv"/>
+                            <constraint firstItem="lDm-vC-rlo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="92" id="eVV-ED-Dji"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                 </viewController>

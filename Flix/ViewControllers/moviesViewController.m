@@ -47,7 +47,6 @@
     [self.tableView addSubview:self.refreshControl];
     
     [self fetchMovies];
-    //[self customizeNavigationBar];
     
     [NSTimer scheduledTimerWithTimeInterval:1.50f target:self selector:@selector(revealData) userInfo:nil repeats:NO];
 }
@@ -87,13 +86,11 @@
     internetReachable = [Reachability reachabilityForInternetConnection];
     [internetReachable startNotifier];
 
-    // check if a pathway to a random host exists
     hostReachable = [Reachability reachabilityWithHostName: @"www.apple.com"];
     [hostReachable startNotifier];
 }
 
 -(void)noConnection{
-    //NSLog(@"%@", self.internetActive ? @"YES" : @"NO");
        if (self.internetActive == NO ) {
            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cannot Get Movies"
                   message:@"The internet connection appears to be offline"
@@ -106,33 +103,28 @@
            [alert addAction:okAction];
            
            [self presentViewController:alert animated:YES completion:^{
-               // optional code for what happens after the alert controller has finished presenting
            }];
        }
 }
 
 - (void) checkNetworkStatus:(NSNotification *)notice
 {
-    // called after network status changes
     NetworkStatus internetStatus = [internetReachable currentReachabilityStatus];
     switch (internetStatus)
     {
         case NotReachable:
         {
-            //NSLog(@"The internet is down.");
             self.internetActive = NO;
             [self noConnection];
             break;
         }
         case ReachableViaWiFi:
         {
-            //NSLog(@"The internet is working via WIFI.");
             self.internetActive = YES;
             break;
         }
         case ReachableViaWWAN:
         {
-            //NSLog(@"The internet is working via WWAN.");
             self.internetActive = YES;
             break;
         }
@@ -144,20 +136,17 @@
             {
             case NotReachable:
         {
-            //NSLog(@"A gateway to the host server is down.");
             self.hostActive = NO;
             break;
             }
             case ReachableViaWiFi:
             {
-            //NSLog(@"A gateway to the host server is working via WIFI.");
             self.hostActive = YES;
             break;
 
     }
     case ReachableViaWWAN:
     {
-        //NSLog(@"A gateway to the host server is working via WWAN.");
         self.hostActive = YES;
         break;
     }
@@ -186,29 +175,21 @@
         NSString *fullPosterUrl = [baseUrlString stringByAppendingFormat:posterUrlString];
         NSURL *posterUrl = [NSURL URLWithString:fullPosterUrl];
         NSURLRequest *request = [NSURLRequest requestWithURL:posterUrl];
-        //[cell.posterView setImageWithURL: posterUrl];
-        //__weak MovieCell *weakSelf = self;
         __weak UIImageView *weakImageView = cell.posterView;
         [cell.posterView setImageWithURLRequest:request placeholderImage:nil
         success:^(NSURLRequest *imageRequest, NSHTTPURLResponse *imageResponse, UIImage *image) {
-            // imageResponse will be nil if the image is cached
             if (imageResponse) {
-                //NSLog(@"Image was NOT cached, fade in image");
                 weakImageView.alpha = 0.0;
                 weakImageView.image = image;
-                
-                //Animate UIImageView back to alpha 1 over 0.3sec
                 [UIView animateWithDuration:6 animations:^{
                     weakImageView.alpha = 1.0;
                 }];
             }
             else {
-                //NSLog(@"Image was cached so just update the image");
                 weakImageView.image = image;
             }
         }
         failure:^(NSURLRequest *request, NSHTTPURLResponse * response, NSError *error) {
-            // do something for the failure condition
             NSLog(@"Process Failed..."); }];
     }else{
         cell.posterView.image = nil;

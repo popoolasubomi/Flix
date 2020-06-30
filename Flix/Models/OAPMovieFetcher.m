@@ -10,8 +10,6 @@
 
 @implementation OAPMovieFetcher
 
-typedef void(^completion)(NSDictionary*);
-
 + (OAPMovieFetcher *)sharedObject {
     static OAPMovieFetcher *sharedClass = nil;
     static dispatch_once_t onceToken;
