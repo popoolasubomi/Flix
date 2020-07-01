@@ -26,7 +26,7 @@
 
 -(void) playVideo{
     
-    NSString *id = [NSString stringWithFormat:@"%@", self.movie[@"id"]];
+    NSString *id = [NSString stringWithFormat:@"%@", self.movie.id_str];
     NSString *urlString = [NSString stringWithFormat: @"https://api.themoviedb.org/3/movie/%@/videos?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed", id];
     NSURL *url = [NSURL URLWithString:urlString];
     NSURLRequest *request = [NSURLRequest requestWithURL:url

@@ -12,10 +12,11 @@
 #import "DetailsViewController.h"
 #import "Reachability.h"
 #import "OAPMovieFetcher.h"
+#import "Movie.h"
 
 @interface MoviesViewController () <UITableViewDelegate, UITableViewDataSource>
 
-@property (nonatomic, strong) NSArray *movies;
+@property (nonatomic, strong) NSMutableArray *movies;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property(nonatomic, strong) UIRefreshControl *refreshControl;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
@@ -54,8 +55,13 @@
 
 -(void) fetchMovies{
     OAPMovieFetcher *oapMovieFetcher = [OAPMovieFetcher sharedObject];
-    [oapMovieFetcher fetchMoviesWithCompletionHandler:^(NSArray *movie) {
-        self.movies = movie;
+    [oapMovieFetcher fetchMoviesWithCompletionHandler:^(NSArray *movies) {
+        NSArray *dictionaries = movies;
+        self.movies = [NSMutableArray new];
+        for (NSDictionary *dictionary in dictionaries) {
+            Movie *movie =  [[Movie alloc] initWithDictionary: dictionary];
+            [self.movies addObject: movie];
+        }
         [self.refreshControl endRefreshing];
         [self.tableView reloadData];
     }];
@@ -163,37 +169,9 @@
 }
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    movieCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MovieCell"];
-    NSDictionary *movie = self.movies[indexPath.row];
-    
-    cell.titleLabel.text = movie[@"title"];
-    cell.synopsisLabel.text = movie[@"overview"];
-    
-    NSString *baseUrlString = @"https://image.tmdb.org/t/p/w500";
-    if ([movie[@"poster_path"] isKindOfClass:[NSString class]]) {
-        NSString *posterUrlString =  movie[@"poster_path"];
-        NSString *fullPosterUrl = [baseUrlString stringByAppendingFormat:posterUrlString];
-        NSURL *posterUrl = [NSURL URLWithString:fullPosterUrl];
-        NSURLRequest *request = [NSURLRequest requestWithURL:posterUrl];
-        __weak UIImageView *weakImageView = cell.posterView;
-        [cell.posterView setImageWithURLRequest:request placeholderImage:nil
-        success:^(NSURLRequest *imageRequest, NSHTTPURLResponse *imageResponse, UIImage *image) {
-            if (imageResponse) {
-                weakImageView.alpha = 0.0;
-                weakImageView.image = image;
-                [UIView animateWithDuration:6 animations:^{
-                    weakImageView.alpha = 1.0;
-                }];
-            }
-            else {
-                weakImageView.image = image;
-            }
-        }
-        failure:^(NSURLRequest *request, NSHTTPURLResponse * response, NSError *error) {
-            NSLog(@"Process Failed..."); }];
-    }else{
-        cell.posterView.image = nil;
-    }
+    MovieCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MovieCell"];
+    Movie *movie = self.movies[indexPath.row];
+    [cell setMovie: movie];
     return cell;
 }
 

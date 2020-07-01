@@ -9,6 +9,7 @@
 #import "DetailsViewController.h"
 #import "UIImageView+AFNetworking.h"
 #import "WebKitViewController.h"
+#import "Movie.h"
 
 @interface DetailsViewController ()
 
@@ -33,13 +34,13 @@
     NSString *baseUrlString = @"https://image.tmdb.org/t/p/w500";
     NSString *smallBaseUrlString = @"https://image.tmdb.org/t/p/w200";
     
-    NSString *posterUrlString = self.movie[@"poster_path"];
+    NSString *posterUrlString = self.movie.posterUrlString;
     NSString *fullPosterUrl = [baseUrlString stringByAppendingFormat:posterUrlString];
     NSURL *posterUrl = [NSURL URLWithString:fullPosterUrl];
     [self.posterView setImageWithURL: posterUrl];
     
-    if ([self.movie[@"backdrop_path"] isKindOfClass:[NSString class]]){
-        NSString *backdropUrlString = self.movie[@"backdrop_path"];
+    if ([self.movie.backdropPath isKindOfClass:[NSString class]]){
+        NSString *backdropUrlString = self.movie.backdropPath;
         NSString *smallFullBackdropUrlString = [smallBaseUrlString stringByAppendingFormat: backdropUrlString];
         NSString *largeFullBackdropUrlString = [baseUrlString stringByAppendingFormat: backdropUrlString];
         NSURL *urlSmall = [NSURL URLWithString: smallFullBackdropUrlString];
@@ -79,10 +80,10 @@
         self.backdropView.image = nil;
     }
     
-    self.titleLabel.text = self.movie[@"title"];
-    self.synopsisLabel.text = self.movie[@"overview"];
-    self.releaseDate.text = self.movie[@"release_date"];
-    self.rating.text = [NSString stringWithFormat: @"%@", self.movie[@"vote_average"]];
+    self.titleLabel.text = self.movie.title;
+    self.synopsisLabel.text = self.movie.overview;
+    self.releaseDate.text = self.movie.releaseDate;
+    self.rating.text = [NSString stringWithFormat: @"%@", self.movie.rating];
     
     [self.titleLabel sizeToFit];
     [self.synopsisLabel sizeToFit];

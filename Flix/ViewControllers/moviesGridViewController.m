@@ -11,11 +11,12 @@
 #import "UIImageView+AFNetworking.h"
 #import "DetailsViewController.h"
 #import "OAPMovieFetcher.h"
+#import "Movie.h"
 
 @interface MoviesGridViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, UISearchBarDelegate>
 
-@property (nonatomic, strong) NSArray *movies;
-@property(nonatomic, strong) NSArray *filteredData;
+@property(nonatomic, strong) NSMutableArray *movies;
+@property(nonatomic, strong) NSMutableArray *filteredData;
 @property(nonatomic, strong) UIRefreshControl *refreshControl;
 
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
@@ -56,8 +57,13 @@
 
 -(void) fetchMovies{
     OAPMovieFetcher *oapMovieFetcher = [OAPMovieFetcher sharedObject];
-    [oapMovieFetcher fetchMoviesWithCompletionHandler:^(NSArray *movie) {
-        self.movies = movie;
+    [oapMovieFetcher fetchMoviesWithCompletionHandler:^(NSArray *movies) {
+        NSArray *dictionaries = movies;
+        self.movies = [NSMutableArray new];
+        for (NSDictionary *dictionary in dictionaries) {
+            Movie *movie =  [[Movie alloc] initWithDictionary: dictionary];
+            [self.movies addObject: movie];
+        }
         self.filteredData = self.movies;
         [self.refreshControl endRefreshing];
         [self.collectionView reloadData];
@@ -70,34 +76,8 @@
 
 - (nonnull __kindof UICollectionViewCell *)collectionView:(nonnull UICollectionView *)collectionView cellForItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
     MovieCollectionCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier: @"MovieCollectionCell" forIndexPath:indexPath];
-    NSDictionary *movie = self.filteredData[indexPath.item];
-    NSString *baseUrlString = @"https://image.tmdb.org/t/p/w500";
-    if ([movie[@"poster_path"] isKindOfClass:[NSString class]]) {
-        NSString *posterUrlString =  movie[@"poster_path"];
-        NSString *fullPosterUrl = [baseUrlString stringByAppendingFormat:posterUrlString];
-        NSURL *posterUrl = [NSURL URLWithString:fullPosterUrl];
-        cell.posterView.image = nil;
-        NSURLRequest *request = [NSURLRequest requestWithURL:posterUrl];
-        __weak UIImageView *weakImageView = cell.posterView;
-        [cell.posterView setImageWithURLRequest: request placeholderImage:nil
-        success:^(NSURLRequest *imageRequest, NSHTTPURLResponse *imageResponse, UIImage *image) {
-            if (imageResponse) {
-                weakImageView.alpha = 0.0;
-                weakImageView.image = image;
-                
-                [UIView animateWithDuration:6 animations:^{
-                    weakImageView.alpha = 1.0;
-                }];
-            }
-            else {
-                weakImageView.image = image;
-            }
-        }
-        failure:^(NSURLRequest *request, NSHTTPURLResponse * response, NSError *error) {
-            NSLog(@"Process Failed..."); }];
-    }else{
-        cell.posterView.image = nil;
-}
+    Movie *movie = self.filteredData[indexPath.item];
+    [cell setMovie: movie];
     return cell;
 }
 
